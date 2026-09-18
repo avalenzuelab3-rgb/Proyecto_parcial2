@@ -12,6 +12,10 @@
 
     <name>Variante A - Gestion de empleados</name>
 
+    <modules>
+        <module>empleados-core</module>
+    </modules>
+
     <properties>
         <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
