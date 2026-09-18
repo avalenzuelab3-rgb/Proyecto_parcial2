@@ -2,6 +2,7 @@ package edu.umg.programacion2.empleados.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,71 +22,87 @@ class EmpleadoServiceTest {
                 new EmpleadoRepositoryMemoria());
     }
 
+    private Empleado crearEmpleadoValido(
+            String nombre,
+            String departamento) {
+
+        return new Empleado(
+                null,
+                nombre,
+                departamento,
+                6500.00,
+                LocalDate.of(2024, 3, 15),
+                true);
+    }
+
     @Test
     void debeCrearEmpleado() {
-        Empleado empleado = new Empleado(
-                null,
-                "Ana López",
-                "Programadora",
-                6500.00,
-                true);
-
-        Empleado creado = service.crear(empleado);
+        Empleado creado = service.crear(
+                crearEmpleadoValido(
+                        "Ana López",
+                        "Sistemas"));
 
         assertNotNull(creado.getId());
         assertEquals("Ana López", creado.getNombre());
+        assertEquals("Sistemas",
+                creado.getDepartamento());
         assertEquals(1, service.listarTodos().size());
     }
 
     @Test
     void debeBuscarEmpleadoPorId() {
-        Empleado empleado = service.crear(new Empleado(
-                null,
-                "Carlos Pérez",
-                "Contador",
-                5500.00,
-                true));
+        Empleado empleado = service.crear(
+                crearEmpleadoValido(
+                        "Carlos Pérez",
+                        "Contabilidad"));
 
         Optional<Empleado> resultado =
                 service.buscarPorId(empleado.getId());
 
         assertTrue(resultado.isPresent());
-        assertEquals("Carlos Pérez",
+        assertEquals(
+                "Carlos Pérez",
                 resultado.get().getNombre());
     }
 
     @Test
     void debeActualizarEmpleado() {
-        Empleado empleado = service.crear(new Empleado(
-                null,
-                "María Gómez",
-                "Secretaria",
-                4500.00,
-                true));
+        Empleado empleado = service.crear(
+                crearEmpleadoValido(
+                        "María Gómez",
+                        "Ventas"));
 
-        empleado.setPuesto("Administradora");
-        empleado.setSalario(6000.00);
+        empleado.setDepartamento(
+                "Recursos Humanos");
+        empleado.setSalario(7000.00);
 
-        boolean actualizado = service.actualizar(empleado);
+        boolean actualizado =
+                service.actualizar(empleado);
 
         assertTrue(actualizado);
-        assertEquals("Administradora",
-                service.buscarPorId(empleado.getId())
-                       .orElseThrow()
-                       .getPuesto());
+
+        Empleado encontrado = service
+                .buscarPorId(empleado.getId())
+                .orElseThrow();
+
+        assertEquals(
+                "Recursos Humanos",
+                encontrado.getDepartamento());
+        assertEquals(
+                7000.00,
+                encontrado.getSalario());
     }
 
     @Test
     void debeEliminarEmpleado() {
-        Empleado empleado = service.crear(new Empleado(
-                null,
-                "Luis Morales",
-                "Técnico",
-                5000.00,
-                true));
+        Empleado empleado = service.crear(
+                crearEmpleadoValido(
+                        "Luis Morales",
+                        "Soporte"));
 
         boolean eliminado =
-                service.eliminarPorId(empleado.getId());
+                service.eliminarPorId(
+                        empleado.getId());
 
         assertTrue(eliminado);
         assertTrue(service.listarTodos().isEmpty());
@@ -93,21 +110,22 @@ class EmpleadoServiceTest {
 
     @Test
     void debeListarEmpleados() {
-        service.crear(new Empleado(
-                null, "Ana", "Programadora", 6500.00, true));
+        service.crear(crearEmpleadoValido(
+                "Ana", "Sistemas"));
 
-        service.crear(new Empleado(
-                null, "Luis", "Técnico", 5000.00, true));
+        service.crear(crearEmpleadoValido(
+                "Luis", "Ventas"));
 
-        List<Empleado> empleados = service.listarTodos();
+        List<Empleado> empleados =
+                service.listarTodos();
 
         assertEquals(2, empleados.size());
     }
 
     @Test
     void debeRechazarNombreVacio() {
-        Empleado empleado = new Empleado(
-                null, " ", "Programadora", 6500.00, true);
+        Empleado empleado = crearEmpleadoValido(
+                " ", "Sistemas");
 
         assertThrows(
                 IllegalArgumentException.class,
@@ -115,9 +133,34 @@ class EmpleadoServiceTest {
     }
 
     @Test
-    void debeRechazarSalarioNegativo() {
-        Empleado empleado = new Empleado(
-                null, "Ana", "Programadora", -100.00, true);
+    void debeRechazarDepartamentoVacio() {
+        Empleado empleado = crearEmpleadoValido(
+                "Ana", " ");
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.crear(empleado));
+    }
+
+    @Test
+    void debeRechazarSalarioCero() {
+        Empleado empleado = crearEmpleadoValido(
+                "Ana", "Sistemas");
+
+        empleado.setSalario(0);
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> service.crear(empleado));
+    }
+
+    @Test
+    void debeRechazarFechaFutura() {
+        Empleado empleado = crearEmpleadoValido(
+                "Ana", "Sistemas");
+
+        empleado.setFechaContratacion(
+                LocalDate.now().plusDays(1));
 
         assertThrows(
                 IllegalArgumentException.class,

@@ -1,5 +1,6 @@
 package edu.umg.programacion2.empleados.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ public class EmpleadoService {
             throw new IllegalArgumentException(
                     "El repositorio no puede ser nulo");
         }
+
         this.repository = repository;
     }
 
@@ -35,7 +37,8 @@ public class EmpleadoService {
     public boolean actualizar(Empleado empleado) {
         validar(empleado);
 
-        if (empleado.getId() == null || empleado.getId() <= 0) {
+        if (empleado.getId() == null
+                || empleado.getId() <= 0) {
             throw new IllegalArgumentException(
                     "El empleado debe tener un id valido");
         }
@@ -60,15 +63,26 @@ public class EmpleadoService {
                     "El nombre es obligatorio");
         }
 
-        if (empleado.getPuesto() == null
-                || empleado.getPuesto().isBlank()) {
+        if (empleado.getDepartamento() == null
+                || empleado.getDepartamento().isBlank()) {
             throw new IllegalArgumentException(
-                    "El puesto es obligatorio");
+                    "El departamento es obligatorio");
         }
 
-        if (empleado.getSalario() < 0) {
+        if (empleado.getSalario() <= 0) {
             throw new IllegalArgumentException(
-                    "El salario no puede ser negativo");
+                    "El salario debe ser mayor a cero");
+        }
+
+        if (empleado.getFechaContratacion() == null) {
+            throw new IllegalArgumentException(
+                    "La fecha de contratacion es obligatoria");
+        }
+
+        if (empleado.getFechaContratacion()
+                .isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException(
+                    "La fecha de contratacion no puede ser futura");
         }
     }
 
