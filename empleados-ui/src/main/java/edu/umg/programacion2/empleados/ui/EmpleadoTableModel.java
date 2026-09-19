@@ -76,6 +76,9 @@ public class EmpleadoTableModel extends AbstractTableModel {
 
             default:
                 return "";
+                
+                
+                
         }
     }
 }
