@@ -25,9 +25,11 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
 
     @Override
     public Empleado crear(Empleado empleado) {
+
         String sql = "INSERT INTO empleados "
-                + "(nombre, departamento, salario, fecha_contratacion, activo) "
-                + "VALUES (?, ?, ?, ?, ?)";
+                + "(nombre, departamento, salario, fecha_contratacion, "
+                + "tipo_contrato, activo) "
+                + "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conexion = conexionBD.obtenerConexion();
              PreparedStatement sentencia = conexion.prepareStatement(
@@ -37,8 +39,11 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
             sentencia.setString(2, empleado.getDepartamento());
             sentencia.setDouble(3, empleado.getSalario());
             sentencia.setDate(
-                    4, Date.valueOf(empleado.getFechaContratacion()));
-            sentencia.setBoolean(5, empleado.isActivo());
+                    4,
+                    Date.valueOf(empleado.getFechaContratacion())
+            );
+            sentencia.setString(5, empleado.getTipoContrato());
+            sentencia.setBoolean(6, empleado.isActivo());
 
             sentencia.executeUpdate();
 
@@ -58,8 +63,9 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
 
     @Override
     public Optional<Empleado> buscarPorId(Long id) {
+
         String sql = "SELECT id, nombre, departamento, salario, "
-                + "fecha_contratacion, activo "
+                + "fecha_contratacion, tipo_contrato, activo "
                 + "FROM empleados WHERE id = ?";
 
         try (Connection conexion = conexionBD.obtenerConexion();
@@ -83,8 +89,9 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
 
     @Override
     public List<Empleado> listarTodos() {
+
         String sql = "SELECT id, nombre, departamento, salario, "
-                + "fecha_contratacion, activo "
+                + "fecha_contratacion, tipo_contrato, activo "
                 + "FROM empleados ORDER BY id";
 
         List<Empleado> empleados = new ArrayList<>();
@@ -107,9 +114,10 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
 
     @Override
     public boolean actualizar(Empleado empleado) {
+
         String sql = "UPDATE empleados "
                 + "SET nombre = ?, departamento = ?, salario = ?, "
-                + "fecha_contratacion = ?, activo = ? "
+                + "fecha_contratacion = ?, tipo_contrato = ?, activo = ? "
                 + "WHERE id = ?";
 
         try (Connection conexion = conexionBD.obtenerConexion();
@@ -119,9 +127,12 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
             sentencia.setString(2, empleado.getDepartamento());
             sentencia.setDouble(3, empleado.getSalario());
             sentencia.setDate(
-                    4, Date.valueOf(empleado.getFechaContratacion()));
-            sentencia.setBoolean(5, empleado.isActivo());
-            sentencia.setLong(6, empleado.getId());
+                    4,
+                    Date.valueOf(empleado.getFechaContratacion())
+            );
+            sentencia.setString(5, empleado.getTipoContrato());
+            sentencia.setBoolean(6, empleado.isActivo());
+            sentencia.setLong(7, empleado.getId());
 
             return sentencia.executeUpdate() > 0;
 
@@ -133,13 +144,13 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
 
     @Override
     public boolean eliminarPorId(Long id) {
+
         String sql = "DELETE FROM empleados WHERE id = ?";
 
         try (Connection conexion = conexionBD.obtenerConexion();
              PreparedStatement sentencia = conexion.prepareStatement(sql)) {
 
             sentencia.setLong(1, id);
-
             return sentencia.executeUpdate() > 0;
 
         } catch (SQLException e) {
@@ -158,7 +169,11 @@ public class EmpleadoRepositoryJdbc implements EmpleadoRepository {
         empleado.setDepartamento(resultado.getString("departamento"));
         empleado.setSalario(resultado.getDouble("salario"));
         empleado.setFechaContratacion(
-                resultado.getDate("fecha_contratacion").toLocalDate());
+                resultado.getDate("fecha_contratacion").toLocalDate()
+        );
+        empleado.setTipoContrato(
+                resultado.getString("tipo_contrato")
+        );
         empleado.setActivo(resultado.getBoolean("activo"));
 
         return empleado;
