@@ -3,15 +3,25 @@ package edu.umg.programacion2.empleados.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import edu.umg.programacion2.empleados.model.Empleado;
 import edu.umg.programacion2.empleados.repository.EmpleadoRepository;
 
 public class EmpleadoService {
 
+    private static final Set<String> TIPOS_CONTRATO_PERMITIDOS =
+            Set.of(
+                    "Temporal",
+                    "Permanente",
+                    "Por hora",
+                    "Ambos"
+            );
+
     private final EmpleadoRepository repository;
 
     public EmpleadoService(EmpleadoRepository repository) {
+
         if (repository == null) {
             throw new IllegalArgumentException(
                     "El repositorio no puede ser nulo");
@@ -35,12 +45,14 @@ public class EmpleadoService {
     }
 
     public boolean actualizar(Empleado empleado) {
+
         validar(empleado);
 
         if (empleado.getId() == null
                 || empleado.getId() <= 0) {
+
             throw new IllegalArgumentException(
-                    "El empleado debe tener un id valido");
+                    "El empleado debe tener un id válido");
         }
 
         return repository.actualizar(empleado);
@@ -52,6 +64,7 @@ public class EmpleadoService {
     }
 
     private void validar(Empleado empleado) {
+
         if (empleado == null) {
             throw new IllegalArgumentException(
                     "El empleado no puede ser nulo");
@@ -59,12 +72,14 @@ public class EmpleadoService {
 
         if (empleado.getNombre() == null
                 || empleado.getNombre().isBlank()) {
+
             throw new IllegalArgumentException(
                     "El nombre es obligatorio");
         }
 
         if (empleado.getDepartamento() == null
                 || empleado.getDepartamento().isBlank()) {
+
             throw new IllegalArgumentException(
                     "El departamento es obligatorio");
         }
@@ -76,20 +91,36 @@ public class EmpleadoService {
 
         if (empleado.getFechaContratacion() == null) {
             throw new IllegalArgumentException(
-                    "La fecha de contratacion es obligatoria");
+                    "La fecha de contratación es obligatoria");
         }
 
         if (empleado.getFechaContratacion()
                 .isAfter(LocalDate.now())) {
+
             throw new IllegalArgumentException(
-                    "La fecha de contratacion no puede ser futura");
+                    "La fecha de contratación no puede ser futura");
+        }
+
+        if (empleado.getTipoContrato() == null
+                || empleado.getTipoContrato().isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "El tipo de contrato es obligatorio");
+        }
+
+        if (!TIPOS_CONTRATO_PERMITIDOS.contains(
+                empleado.getTipoContrato())) {
+
+            throw new IllegalArgumentException(
+                    "El tipo de contrato seleccionado no es válido");
         }
     }
 
     private void validarId(Long id) {
+
         if (id == null || id <= 0) {
             throw new IllegalArgumentException(
-                    "El id debe ser valido");
+                    "El id debe ser válido");
         }
     }
 }
