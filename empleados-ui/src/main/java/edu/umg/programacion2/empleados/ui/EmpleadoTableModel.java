@@ -12,12 +12,13 @@ public class EmpleadoTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
 
     private final String[] columnas = {
-        "ID",
-        "Nombre",
-        "Departamento",
-        "Salario",
-        "Fecha de contratación",
-        "Activo"
+            "ID",
+            "Nombre",
+            "Departamento",
+            "Salario",
+            "Fecha de contratación",
+            "Tipo de contrato",
+            "Activo"
     };
 
     private List<Empleado> empleados = new ArrayList<>();
@@ -48,21 +49,31 @@ public class EmpleadoTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int fila, int columna) {
+
         Empleado empleado = empleados.get(fila);
 
         switch (columna) {
             case 0:
                 return empleado.getId();
+
             case 1:
                 return empleado.getNombre();
+
             case 2:
                 return empleado.getDepartamento();
+
             case 3:
                 return empleado.getSalario();
+
             case 4:
                 return empleado.getFechaContratacion();
+
             case 5:
+                return empleado.getTipoContrato();
+
+            case 6:
                 return empleado.isActivo() ? "Sí" : "No";
+
             default:
                 return "";
         }
